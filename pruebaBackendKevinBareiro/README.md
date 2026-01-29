@@ -107,7 +107,7 @@ cp .env.example .env
 #### Requisitos previos
 - PHP 8.2 o superior
 - Composer
-- MySQL 8.0 o superior
+- MySQL 8.0 o superior (o MySQL 5.6+ / MariaDB 10.0+)
 - Git
 
 #### Pasos de instalación

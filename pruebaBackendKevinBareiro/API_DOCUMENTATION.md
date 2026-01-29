@@ -351,8 +351,10 @@ curl -X POST http://localhost/api/products/1/prices \
 
 | Campo | Tipo | Descripción | Validación |
 |-------|------|-------------|------------|
-| `currency_id` | integer | ID de la moneda | Requerido, debe existir en tabla currencies |
+| `currency_id` | integer | ID de la moneda | Requerido, debe existir en tabla currencies, único por producto |
 | `price` | decimal | Precio en la moneda especificada | Requerido, numérico, mínimo 0 |
+
+**Nota importante**: Un producto solo puede tener **un precio por moneda**. Si intentas crear un precio duplicado para la misma moneda, recibirás un error de validación.
 
 **Response exitoso** (201 Created):
 ```json
@@ -371,13 +373,23 @@ curl -X POST http://localhost/api/products/1/prices \
 }
 ```
 
-**Response de error** (422 Unprocessable Entity):
+**Response de error - Campos requeridos** (422 Unprocessable Entity):
 ```json
 {
   "message": "The currency id field is required. (and 1 more error)",
   "errors": {
     "currency_id": ["The currency id field is required."],
     "price": ["The price field is required."]
+  }
+}
+```
+
+**Response de error - Precio duplicado** (422 Unprocessable Entity):
+```json
+{
+  "message": "Ya existe un precio para este producto en la moneda seleccionada.",
+  "errors": {
+    "currency_id": ["Ya existe un precio para este producto en la moneda seleccionada."]
   }
 }
 ```

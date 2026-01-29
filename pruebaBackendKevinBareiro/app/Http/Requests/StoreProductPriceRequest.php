@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreProductPriceRequest extends FormRequest
 {
@@ -22,8 +23,24 @@ class StoreProductPriceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'currency_id' => ['required', 'integer', 'exists:currencies,id'],
+            'currency_id' => [
+                'required',
+                'integer',
+                'exists:currencies,id',
+                Rule::unique('product_prices')
+                    ->where('product_id', $this->route('product')->id),
+            ],
             'price' => ['required', 'numeric', 'min:0'],
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     */
+    public function messages(): array
+    {
+        return [
+            'currency_id.unique' => 'Ya existe un precio para este producto en la moneda seleccionada.',
         ];
     }
 }
