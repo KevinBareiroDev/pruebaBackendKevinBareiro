@@ -22,7 +22,7 @@ API RESTful desarrollada en Laravel 12 para la gestión de productos con soporte
 - ✅ Relaciones Eloquent optimizadas
 - ✅ Tests automatizados
 - ✅ Seeders con datos de ejemplo
-- ✅ Documentación completa (Postman, Insomnia)
+- ✅ Documentación completa (Postman, Insomnia,Swagger)
 
 ## 🗄️ Estructura de Base de Datos
 
