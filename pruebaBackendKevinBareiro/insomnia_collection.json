@@ -1,0 +1,187 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-01-29T17:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "wrk_products_api",
+      "_type": "workspace",
+      "name": "API Gestión de Productos - Multi-Divisa",
+      "description": "API RESTful de gestión de productos con soporte multi-divisa desarrollada en Laravel 12",
+      "scope": "collection"
+    },
+    {
+      "_id": "env_base",
+      "_type": "environment",
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost/api"
+      },
+      "parentId": "wrk_products_api"
+    },
+    {
+      "_id": "req_list_products",
+      "_type": "request",
+      "parentId": "fld_products",
+      "name": "Listar todos los productos",
+      "description": "Obtiene una lista de todos los productos con sus relaciones (moneda base y precios alternativos)",
+      "url": "{{ _.base_url }}/products",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_create_product",
+      "_type": "request",
+      "parentId": "fld_products",
+      "name": "Crear un nuevo producto",
+      "description": "Crea un nuevo producto en el sistema. Todos los campos son requeridos.",
+      "url": "{{ _.base_url }}/products",
+      "method": "POST",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Mouse Logitech MX Master 3\",\n  \"description\": \"Mouse ergonómico inalámbrico de alta precisión\",\n  \"price\": 99.99,\n  \"currency_id\": 1,\n  \"tax_cost\": 9.99,\n  \"manufacturing_cost\": 45.00\n}"
+      }
+    },
+    {
+      "_id": "req_show_product",
+      "_type": "request",
+      "parentId": "fld_products",
+      "name": "Obtener un producto específico",
+      "description": "Obtiene los detalles de un producto específico por su ID",
+      "url": "{{ _.base_url }}/products/1",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_update_product",
+      "_type": "request",
+      "parentId": "fld_products",
+      "name": "Actualizar un producto",
+      "description": "Actualiza los datos de un producto existente. Todos los campos son opcionales.",
+      "url": "{{ _.base_url }}/products/1",
+      "method": "PUT",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Laptop Dell XPS 15 (2026)\",\n  \"price\": 1399.99\n}"
+      }
+    },
+    {
+      "_id": "req_delete_product",
+      "_type": "request",
+      "parentId": "fld_products",
+      "name": "Eliminar un producto",
+      "description": "Elimina un producto (soft delete). El producto no se borra físicamente de la base de datos.",
+      "url": "{{ _.base_url }}/products/1",
+      "method": "DELETE",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_list_prices",
+      "_type": "request",
+      "parentId": "fld_prices",
+      "name": "Listar precios de un producto",
+      "description": "Obtiene todos los precios alternativos de un producto en diferentes monedas",
+      "url": "{{ _.base_url }}/products/1/prices",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_create_price",
+      "_type": "request",
+      "parentId": "fld_prices",
+      "name": "Crear un precio alternativo",
+      "description": "Crea un nuevo precio para el producto en una moneda diferente",
+      "url": "{{ _.base_url }}/products/1/prices",
+      "method": "POST",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"currency_id\": 2,\n  \"price\": 50000.00\n}"
+      }
+    },
+    {
+      "_id": "req_delete_price",
+      "_type": "request",
+      "parentId": "fld_prices",
+      "name": "Eliminar un precio alternativo",
+      "description": "Elimina un precio alternativo de un producto",
+      "url": "{{ _.base_url }}/products/1/prices/1",
+      "method": "DELETE",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "fld_products",
+      "_type": "request_group",
+      "parentId": "wrk_products_api",
+      "name": "Products",
+      "description": "Endpoints para la gestión completa de productos (CRUD)"
+    },
+    {
+      "_id": "fld_prices",
+      "_type": "request_group",
+      "parentId": "wrk_products_api",
+      "name": "Product Prices",
+      "description": "Endpoints para la gestión de precios alternativos en diferentes monedas"
+    }
+  ]
+}

@@ -1,59 +1,250 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# API RESTful de Gestión de Productos con Multi-Divisa
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 📋 Descripción
 
-## About Laravel
+API RESTful desarrollada en Laravel 12 para la gestión de productos con soporte multi-divisa. Permite realizar operaciones CRUD sobre productos y gestionar precios en diferentes monedas.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Tecnologías
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **PHP**: 8.2
+- **Laravel**: 12.0
+- **Base de datos**: MySQL
+- **Testing**: PHPUnit 11.5
+- **Contenedores**: Laravel Sail (Docker)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 📦 Características
 
-## Learning Laravel
+- ✅ CRUD completo de productos
+- ✅ Gestión de precios en múltiples monedas
+- ✅ Soft deletes en productos
+- ✅ Validación robusta con FormRequests
+- ✅ Respuestas JSON con API Resources
+- ✅ Relaciones Eloquent optimizadas
+- ✅ Tests automatizados
+- ✅ Seeders con datos de ejemplo
+- ✅ Documentación completa (Postman, Insomnia)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🗄️ Estructura de Base de Datos
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Tabla: `currencies`
+- `id`: Primary key
+- `name`: Nombre de la moneda (ej: US Dollar)
+- `symbol`: Símbolo (ej: USD)
+- `exchange_rate`: Tasa de cambio respecto al USD
+- `timestamps`
 
-## Laravel Sponsors
+### Tabla: `products`
+- `id`: Primary key
+- `name`: Nombre del producto
+- `description`: Descripción
+- `price`: Precio base
+- `currency_id`: Foreign key a currencies (moneda base)
+- `tax_cost`: Costo de impuestos
+- `manufacturing_cost`: Costo de fabricación
+- `timestamps`
+- `deleted_at`: Soft delete
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Tabla: `product_prices`
+- `id`: Primary key
+- `product_id`: Foreign key a products
+- `currency_id`: Foreign key a currencies
+- `price`: Precio en la moneda alternativa
+- `timestamps`
 
-### Premium Partners
+## 🛠️ Instalación
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Opción 1: Con Docker (Laravel Sail) - Recomendado
 
-## Contributing
+#### Requisitos previos
+- Docker y Docker Compose instalados
+- Git
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+#### Pasos de instalación
 
-## Code of Conduct
+1. **Clonar el repositorio**
+```bash
+git clone <repository-url>
+cd pruebaBackendKevinBareiro
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+2. **Instalar dependencias de Composer (sin Sail aún)**
+```bash
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v "$(pwd):/var/www/html" \
+    -w /var/www/html \
+    laravelsail/php82-composer:latest \
+    composer install --ignore-platform-reqs
+```
 
-## Security Vulnerabilities
+3. **Configurar variables de entorno**
+```bash
+cp .env.example .env
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+4. **Levantar contenedores con Sail**
+```bash
+./vendor/bin/sail up -d
+```
 
-## License
+5. **Generar key de aplicación**
+```bash
+./vendor/bin/sail artisan key:generate
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+6. **Ejecutar migraciones**
+```bash
+./vendor/bin/sail artisan migrate
+```
+
+7. **Ejecutar seeders (datos de ejemplo)**
+```bash
+./vendor/bin/sail artisan db:seed
+```
+
+### Opción 2: Sin Docker (Instalación tradicional)
+
+#### Requisitos previos
+- PHP 8.2 o superior
+- Composer
+- MySQL 8.0 o superior
+- Git
+
+#### Pasos de instalación
+
+1. **Clonar el repositorio**
+```bash
+git clone <repository-url>
+cd pruebaBackendKevinBareiro
+```
+
+2. **Instalar dependencias**
+```bash
+composer install
+```
+
+3. **Configurar variables de entorno**
+```bash
+cp .env.example .env
+```
+
+4. **Configurar base de datos en .env**
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=products_api
+DB_USERNAME=tu_usuario
+DB_PASSWORD=tu_contraseña
+```
+
+5. **Crear base de datos**
+```bash
+mysql -u root -p -e "CREATE DATABASE products_api;"
+```
+
+6. **Generar key de aplicación**
+```bash
+php artisan key:generate
+```
+
+7. **Ejecutar migraciones**
+```bash
+php artisan migrate
+```
+
+8. **Ejecutar seeders (datos de ejemplo)**
+```bash
+php artisan db:seed
+```
+
+9. **Levantar servidor de desarrollo**
+```bash
+php artisan serve
+```
+
+La API estará disponible en `http://localhost:8000/api`
+
+## 🧪 Ejecutar Tests
+
+**Con Docker (Sail):**
+```bash
+./vendor/bin/sail artisan test
+```
+
+O con más detalle:
+```bash
+./vendor/bin/sail artisan test --coverage
+```
+
+**Sin Docker:**
+```bash
+php artisan test
+```
+
+O con más detalle:
+```bash
+php artisan test --coverage
+```
+
+## 📚 Endpoints Disponibles
+
+### Productos
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/api/products` | Listar todos los productos |
+| POST | `/api/products` | Crear un nuevo producto |
+| GET | `/api/products/{id}` | Obtener un producto específico |
+| PUT/PATCH | `/api/products/{id}` | Actualizar un producto |
+| DELETE | `/api/products/{id}` | Eliminar un producto (soft delete) |
+
+### Precios de Productos
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/api/products/{id}/prices` | Listar precios de un producto |
+| POST | `/api/products/{id}/prices` | Crear precio en otra moneda |
+| DELETE | `/api/products/{id}/prices/{price_id}` | Eliminar un precio |
+
+## 📖 Documentación Detallada
+
+Para más detalles sobre los endpoints, consulta:
+- **[API_DOCUMENTATION.md](API_DOCUMENTATION.md)**: Documentación técnica completa
+- **[postman_collection.json](postman_collection.json)**: Colección de Postman
+- **[insomnia_collection.json](insomnia_collection.json)**: Colección de Insomnia
+
+## 🔧 Comandos Útiles
+
+```bash
+# Limpiar caché
+./vendor/bin/sail artisan cache:clear
+
+# Refrescar base de datos con seeders
+./vendor/bin/sail artisan migrate:fresh --seed
+
+# Ver rutas disponibles
+./vendor/bin/sail artisan route:list
+
+# Ejecutar Pint (code style)
+./vendor/bin/sail pint
+```
+
+## 📝 Datos de Ejemplo (Seeders)
+
+Los seeders crean:
+- **3 monedas**: USD, VES (Bolívar Venezolano), ARS (Peso Argentino)
+- **3 productos de ejemplo**: Laptop, Mouse, Teclado
+- **Precios alternativos** para cada producto en diferentes monedas
+
+## 🔒 Seguridad
+
+- Validación de datos con FormRequests
+- Sanitización automática de inputs
+- Rate limiting configurado
+- Manejo de errores centralizado
+- Sin autenticación (según requerimientos para facilitar pruebas)
+
+## 📄 Licencia
+
+MIT License
