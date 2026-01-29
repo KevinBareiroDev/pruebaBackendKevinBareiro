@@ -210,9 +210,29 @@ php artisan test --coverage
 ## 📖 Documentación Detallada
 
 Para más detalles sobre los endpoints, consulta:
-- **[API_DOCUMENTATION.md](API_DOCUMENTATION.md)**: Documentación técnica completa
-- **[postman_collection.json](postman_collection.json)**: Colección de Postman
-- **[insomnia_collection.json](insomnia_collection.json)**: Colección de Insomnia
+- **[API_DOCUMENTATION.md](API_DOCUMENTATION.md)**: Documentación técnica completa con ejemplos de cURL
+- **[openapi.yaml](openapi.yaml)**: Especificación OpenAPI 3.0 (Swagger)
+- **[postman_collection.json](postman_collection.json)**: Colección de Postman (importar directamente)
+- **[insomnia_collection.json](insomnia_collection.json)**: Colección de Insomnia (importar directamente)
+
+### 🔍 Visualizar documentación OpenAPI/Swagger
+
+**Opción 1: Swagger Editor Online**
+1. Ir a [https://editor.swagger.io/](https://editor.swagger.io/)
+2. Copiar el contenido de `openapi.yaml`
+3. Pegarlo en el editor
+4. Explorar la documentación interactiva
+
+**Opción 2: Swagger UI con Docker (local)**
+```bash
+docker run -p 8080:8080 -e SWAGGER_JSON=/openapi.yaml -v $(pwd):/usr/share/nginx/html swaggerapi/swagger-ui
+```
+Luego abrir: `http://localhost:8080`
+
+**Opción 3: Importar en Postman**
+1. Abrir Postman
+2. Import → File → Seleccionar `openapi.yaml`
+3. Postman generará automáticamente la colección
 
 ## 🔧 Comandos Útiles
 

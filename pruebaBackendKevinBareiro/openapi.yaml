@@ -1,0 +1,668 @@
+openapi: 3.0.0
+info:
+  title: API de Gestión de Productos con Multi-Divisa
+  description: |
+    API RESTful desarrollada en Laravel 12 para la gestión de productos con soporte multi-divisa.
+    
+    Permite realizar operaciones CRUD sobre productos y gestionar precios en diferentes monedas.
+    
+    **Características:**
+    - CRUD completo de productos
+    - Gestión de precios en múltiples monedas
+    - Soft deletes en productos
+    - Validación robusta
+    - Respuestas JSON estructuradas
+  version: 1.0.0
+  contact:
+    name: Kevin Bareiro
+    email: kevin@example.com
+
+servers:
+  - url: http://localhost/api
+    description: Servidor de desarrollo con Docker (Sail)
+  - url: http://localhost:8000/api
+    description: Servidor de desarrollo sin Docker
+
+tags:
+  - name: Products
+    description: Endpoints para la gestión completa de productos (CRUD)
+  - name: Product Prices
+    description: Endpoints para la gestión de precios alternativos en diferentes monedas
+
+paths:
+  /products:
+    get:
+      tags:
+        - Products
+      summary: Listar todos los productos
+      description: Obtiene una lista de todos los productos con sus relaciones (moneda base y precios alternativos)
+      operationId: listProducts
+      responses:
+        '200':
+          description: Lista de productos obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductResource'
+              example:
+                data:
+                  - id: 1
+                    name: "Laptop Dell XPS 15"
+                    description: "Laptop de alto rendimiento con procesador Intel i7"
+                    price: "1299.99"
+                    tax_cost: "129.99"
+                    manufacturing_cost: "800.00"
+                    created_at: "2026-01-29T12:00:00.000000Z"
+                    updated_at: "2026-01-29T12:00:00.000000Z"
+                    currency:
+                      id: 1
+                      name: "US Dollar"
+                      symbol: "USD"
+                      exchange_rate: "1.0000"
+                    prices:
+                      - id: 1
+                        product_id: 1
+                        price: "47449.64"
+                        currency:
+                          id: 2
+                          name: "Venezuelan Bolívar"
+                          symbol: "VES"
+                          exchange_rate: "36.5000"
+
+    post:
+      tags:
+        - Products
+      summary: Crear un nuevo producto
+      description: Crea un nuevo producto en el sistema
+      operationId: createProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+            example:
+              name: "Mouse Logitech MX Master 3"
+              description: "Mouse ergonómico inalámbrico de alta precisión"
+              price: 99.99
+              currency_id: 1
+              tax_cost: 9.99
+              manufacturing_cost: 45.00
+      responses:
+        '201':
+          description: Producto creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductResource'
+              example:
+                data:
+                  id: 4
+                  name: "Mouse Logitech MX Master 3"
+                  description: "Mouse ergonómico inalámbrico de alta precisión"
+                  price: "99.99"
+                  tax_cost: "9.99"
+                  manufacturing_cost: "45.00"
+                  created_at: "2026-01-29T14:30:00.000000Z"
+                  updated_at: "2026-01-29T14:30:00.000000Z"
+                  currency:
+                    id: 1
+                    name: "US Dollar"
+                    symbol: "USD"
+                    exchange_rate: "1.0000"
+                  prices: []
+        '422':
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+              example:
+                message: "The name field is required. (and 5 more errors)"
+                errors:
+                  name:
+                    - "The name field is required."
+                  description:
+                    - "The description field is required."
+                  price:
+                    - "The price field is required."
+                  currency_id:
+                    - "The currency id field is required."
+                  tax_cost:
+                    - "The tax cost field is required."
+                  manufacturing_cost:
+                    - "The manufacturing cost field is required."
+
+  /products/{id}:
+    get:
+      tags:
+        - Products
+      summary: Obtener un producto específico
+      description: Obtiene los detalles de un producto específico por su ID
+      operationId: showProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Producto obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductResource'
+        '404':
+          description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+              example:
+                message: "No query results for model [App\\Models\\Product] 999"
+
+    put:
+      tags:
+        - Products
+      summary: Actualizar un producto
+      description: Actualiza los datos de un producto existente. Todos los campos son opcionales.
+      operationId: updateProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdateRequest'
+            example:
+              name: "Laptop Dell XPS 15 (2026)"
+              price: 1399.99
+      responses:
+        '200':
+          description: Producto actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductResource'
+        '404':
+          description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '422':
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+    patch:
+      tags:
+        - Products
+      summary: Actualizar un producto (parcial)
+      description: Actualiza parcialmente los datos de un producto existente
+      operationId: patchProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdateRequest'
+      responses:
+        '200':
+          description: Producto actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductResource'
+        '404':
+          description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '422':
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+    delete:
+      tags:
+        - Products
+      summary: Eliminar un producto
+      description: Elimina un producto (soft delete). El producto no se borra físicamente de la base de datos.
+      operationId: deleteProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Producto eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Product deleted successfully"
+        '404':
+          description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /products/{product_id}/prices:
+    get:
+      tags:
+        - Product Prices
+      summary: Listar precios de un producto
+      description: Obtiene todos los precios alternativos de un producto en diferentes monedas
+      operationId: listProductPrices
+      parameters:
+        - name: product_id
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Lista de precios obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductPriceResource'
+              example:
+                data:
+                  - id: 1
+                    product_id: 1
+                    price: "47449.64"
+                    currency:
+                      id: 2
+                      name: "Venezuelan Bolívar"
+                      symbol: "VES"
+                      exchange_rate: "36.5000"
+                  - id: 2
+                    product_id: 1
+                    price: "1234495.05"
+                    currency:
+                      id: 3
+                      name: "Argentine Peso"
+                      symbol: "ARS"
+                      exchange_rate: "950.0000"
+
+    post:
+      tags:
+        - Product Prices
+      summary: Crear un precio alternativo
+      description: Crea un nuevo precio para el producto en una moneda diferente
+      operationId: createProductPrice
+      parameters:
+        - name: product_id
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductPriceRequest'
+            example:
+              currency_id: 2
+              price: 50000.00
+      responses:
+        '201':
+          description: Precio creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductPriceResource'
+              example:
+                data:
+                  id: 5
+                  product_id: 1
+                  price: "50000.00"
+                  currency:
+                    id: 2
+                    name: "Venezuelan Bolívar"
+                    symbol: "VES"
+                    exchange_rate: "36.5000"
+        '422':
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /products/{product_id}/prices/{price_id}:
+    delete:
+      tags:
+        - Product Prices
+      summary: Eliminar un precio alternativo
+      description: Elimina un precio alternativo de un producto
+      operationId: deleteProductPrice
+      parameters:
+        - name: product_id
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: integer
+            example: 1
+        - name: price_id
+          in: path
+          required: true
+          description: ID del precio
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Precio eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Product price deleted successfully"
+        '404':
+          description: Precio no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+components:
+  schemas:
+    Currency:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "US Dollar"
+        symbol:
+          type: string
+          example: "USD"
+        exchange_rate:
+          type: string
+          format: decimal
+          example: "1.0000"
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Laptop Dell XPS 15"
+        description:
+          type: string
+          example: "Laptop de alto rendimiento con procesador Intel i7"
+        price:
+          type: string
+          format: decimal
+          example: "1299.99"
+        currency_id:
+          type: integer
+          example: 1
+        tax_cost:
+          type: string
+          format: decimal
+          example: "129.99"
+        manufacturing_cost:
+          type: string
+          format: decimal
+          example: "800.00"
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-01-29T12:00:00.000000Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-01-29T12:00:00.000000Z"
+
+    ProductPrice:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        product_id:
+          type: integer
+          example: 1
+        currency_id:
+          type: integer
+          example: 2
+        price:
+          type: string
+          format: decimal
+          example: "47449.64"
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-01-29T12:00:00.000000Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-01-29T12:00:00.000000Z"
+
+    ProductResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Laptop Dell XPS 15"
+        description:
+          type: string
+          example: "Laptop de alto rendimiento con procesador Intel i7"
+        price:
+          type: string
+          format: decimal
+          example: "1299.99"
+        tax_cost:
+          type: string
+          format: decimal
+          example: "129.99"
+        manufacturing_cost:
+          type: string
+          format: decimal
+          example: "800.00"
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-01-29T12:00:00.000000Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-01-29T12:00:00.000000Z"
+        currency:
+          $ref: '#/components/schemas/Currency'
+        prices:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductPriceResource'
+
+    ProductPriceResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        product_id:
+          type: integer
+          example: 1
+        price:
+          type: string
+          format: decimal
+          example: "47449.64"
+        currency:
+          $ref: '#/components/schemas/Currency'
+
+    ProductRequest:
+      type: object
+      required:
+        - name
+        - description
+        - price
+        - currency_id
+        - tax_cost
+        - manufacturing_cost
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          example: "Mouse Logitech MX Master 3"
+        description:
+          type: string
+          example: "Mouse ergonómico inalámbrico de alta precisión"
+        price:
+          type: number
+          format: decimal
+          minimum: 0
+          example: 99.99
+        currency_id:
+          type: integer
+          example: 1
+        tax_cost:
+          type: number
+          format: decimal
+          minimum: 0
+          example: 9.99
+        manufacturing_cost:
+          type: number
+          format: decimal
+          minimum: 0
+          example: 45.00
+
+    ProductUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          example: "Laptop Dell XPS 15 (2026)"
+        description:
+          type: string
+          example: "Laptop de alto rendimiento actualizada"
+        price:
+          type: number
+          format: decimal
+          minimum: 0
+          example: 1399.99
+        currency_id:
+          type: integer
+          example: 1
+        tax_cost:
+          type: number
+          format: decimal
+          minimum: 0
+          example: 139.99
+        manufacturing_cost:
+          type: number
+          format: decimal
+          minimum: 0
+          example: 850.00
+
+    ProductPriceRequest:
+      type: object
+      required:
+        - currency_id
+        - price
+      properties:
+        currency_id:
+          type: integer
+          example: 2
+        price:
+          type: number
+          format: decimal
+          minimum: 0
+          example: 50000.00
+
+    ValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "The name field is required. (and 5 more errors)"
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+    NotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "No query results for model [App\\Models\\Product] 999"
